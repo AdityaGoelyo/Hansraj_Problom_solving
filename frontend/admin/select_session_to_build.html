@@ -9,6 +9,7 @@
 
 <body>
 
+    <script src = "admin_auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const { createClient } = supabase;
@@ -41,16 +42,19 @@
 
         <script>
             async function init() {
-                const container = document.getElementById('the_screen');
-                const { data, error } = await client.from('sessions').select('*');
-                for (const session of data) {
-                    const cell = document.createElement('button');
-                    cell.className = 'cell';
-                    cell.textContent = session.title;
-                    cell.addEventListener('click', function click() {
-                        window.location.href = 'session_builder.html?session=' + session.id;
-                    });
-                    container.appendChild(cell);
+                const ok = await isLoggedInAndAdmin();
+                if (ok) {
+                    const container = document.getElementById('the_screen');
+                    const { data, error } = await client.from('sessions').select('*');
+                    for (const session of data) {
+                        const cell = document.createElement('button');
+                        cell.className = 'cell';
+                        cell.textContent = session.title;
+                        cell.addEventListener('click', function click() {
+                            window.location.href = 'session_builder.html?session=' + session.id;
+                        });
+                        container.appendChild(cell);
+                    }
                 }
             }
             init();

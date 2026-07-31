@@ -37,18 +37,22 @@
 
     <script>
 
-            // Load some data
+            async function init() {
+                // Load some data
 
-            const params = new URLSearchParams(window.location.search);
-            const sessionId = params.get('session');
-            const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
-            const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
+                const params = new URLSearchParams(window.location.search);
+                const sessionId = params.get('session');
+                const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
+                const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
 
-            // Populate first column
+                // Populate first column
 
-            const title_cell = document.getElementById('title');
-            title_cell.textContent = session.title;
+                const title_cell = document.getElementById('title');
+                title_cell.textContent = session.title;
 
+            }
+
+            init();
     </script>
 
 </body>
