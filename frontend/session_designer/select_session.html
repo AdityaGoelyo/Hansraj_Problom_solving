@@ -17,6 +17,17 @@
 
     <div class = "screen" style="justify-content: center;" id = "the_screen">
 
+        <button class = "cell" id = "back">Back</button>
+        <script>
+
+            const back_button = document.getElementById("back");
+            function go_back() {
+                window.location.href = 'admin_homepage.html'
+            }
+            back_button.addEventListener('click', go_back)
+
+        </script>
+
         <button id = "make_new" class = "cell"> New Session </button>
         <script>
             const make_new_button = document.getElementById('make_new')

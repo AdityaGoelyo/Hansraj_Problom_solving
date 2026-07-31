@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Session Builder</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "screen" style="justify-content: center;">
+
+        <button class = "cell" id = "profile_login"></button>
+        <button class = "cell" id = "edit_sessions">Make or Edit Sessions</button>
+        <button class = "cell" id = "conduct_sessions">Conduct Sessions</button>
+
+    </div>
+
+    <script>
+
+        // profile or Login
+
+        async function init() {
+            const profile_button = document.getElementById('profile_login')
+            const { data: { user } } = await client.auth.getUser();
+            console.log(user);
+
+            let isAdmin = false;
+            if (user) {
+                const { data: admin } = await client.from('admins').select('*').eq('id', user.id).single();
+                if (admin) {
+                    isAdmin = true;
+                } else {
+                    await client.auth.signOut();
+                }
+            }
+
+            if (isAdmin) {
+                profile_button.textContent = user.user_metadata.name
+                await client.from('solvers').upsert({id: user.id, name: user.user_metadata.name, email: user.email})
+                function goProfile() {
+                    window.location.href = 'admin_profile.html';
+                }
+                profile_button.addEventListener('click', goProfile)
+            } else {
+                profile_button.textContent = 'Login'
+                function goLogin() {
+                    window.location.href = 'admin_login.html';
+                }
+                profile_button.addEventListener('click', goLogin)
+            }
+        }
+
+        init();
+
+        // make or edit session page
+
+        const edit_button = document.getElementById('edit_sessions');
+        function go_edit() {
+            window.location.href = 'select_session.html';
+        }
+        edit_button.addEventListener('click', go_edit)
+
+        // conduct sessions
+
+        const conduct_button = document.getElementById('conduct_sessions');
+        function go_conduct() {
+            window.location.href = 'select_session_to_conduct.html';
+        }
+        conduct_button.addEventListener('click', go_conduct);
+
+    </script>
+
+</body>
+
+</html>

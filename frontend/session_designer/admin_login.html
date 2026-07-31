@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Session Builder</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "screen" style="justify-content: center;">
+
+        <button class = "cell" id = "back">Back</button>
+        <button class = "cell" id = "google-login">Sign in with Google</button>
+
+    </div>
+
+    <script>
+
+        // back button
+
+        const backButton = document.getElementById("back");
+        function goBack() {
+            window.location.href = 'admin_homepage.html';
+        }
+        backButton.addEventListener('click', goBack);
+
+        // login button
+
+        const button = document.getElementById('google-login');
+        async function handleLogin() {
+        await client.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: 'https://adityagoelyo.github.io/Hansraj_Problom_solving/frontend/session_designer/admin_homepage.html' }
+        });
+        }
+        button.addEventListener('click', handleLogin);
+
+    </script>
+
+</body>
+
+</html>

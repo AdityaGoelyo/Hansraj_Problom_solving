@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Session Builder</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+
+<body>
+
+    <style>
+        body {
+            max-width: 1440px;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "columns">
+
+        <!--column showing session details-->
+        <div class = "cell_column" id = "session_details_column">
+
+            <header class = "cell" id = "title"></header>
+
+        </div>
+
+    </div>
+
+    <!--Jawascript for everything-->
+
+    <script>
+
+            // Load some data
+
+            const params = new URLSearchParams(window.location.search);
+            const sessionId = params.get('session');
+            const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
+            const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
+
+            // Populate first column
+
+            const title_cell = document.getElementById('title');
+            title_cell.textContent = session.title;
+
+    </script>
+
+</body>
+
+</html>
