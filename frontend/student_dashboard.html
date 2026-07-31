@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="shared.css">
+</head>
+
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "screen" style = "justify-content: center;">
+
+        <!-- The Profile / Login button -->
+
+        <button class = "cell" id = "profile_login">
+
+        </button>
+
+        <!-- The Sessions Button -->
+
+        <button class = "cell" id = "sessions">
+            Sessions
+        </button>
+
+        <!-- The Problem Library Button -->
+        
+        <button class = "cell" id = "problem_library">
+            Problem Library
+        </button>
+
+    </div>
+
+        <script>
+            async function init() {
+                const profile_button = document.getElementById('profile_login')
+                const { data: { user } } = await client.auth.getUser();
+                console.log(user);
+                if (user) {
+                    profile_button.textContent = user.user_metadata.name
+                    await client.from('solvers').upsert({id: user.id, name: user.user_metadata.name, email: user.email})
+                    function goProfile() {
+                        window.location.href = 'student_profile.html';
+                    }
+                    profile_button.addEventListener('click', goProfile)
+                } else{
+                    profile_button.textContent = 'Login'
+                    function goLogin() {
+                        window.location.href = 'student_login.html';
+                    }
+                    profile_button.addEventListener('click', goLogin)
+                }
+            }
+            init();
+
+            const sessions_button = document.getElementById("sessions")
+            function goSessions() {
+                window.location.href = 'student_sessions.html';
+            }
+            sessions_button.addEventListener('click', goSessions)
+
+            const problem_library_button = document.getElementById("problem_library")
+            function goProblemLibrary() {
+                window.location.href = 'student_problem_library.html';
+            }
+            problem_library_button.addEventListener('click', goProblemLibrary)
+        </script>
+</body> 
+
+</html>

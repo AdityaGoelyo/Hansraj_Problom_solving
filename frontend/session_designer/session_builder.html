@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Session Builder</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+
+<body>
+
+    <style>
+        body {
+            max-width: 1440px;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "columns">
+
+        <!--form like details-->
+        <div class = "cell_column" id = "form">
+
+            <!--back button-->
+            <button class="cell" id = "back_button">Back</button>
+            <script>
+                const back_button = document.getElementById("back_button");
+                function back() {
+                    window.location.href = 'select_session.html';
+                }
+                back_button.addEventListener('click', back)
+            </script>
+
+
+            <input type = "text" id = "title_input" placeholder="Session title">
+            <input type = "text" id = "id_input" value = "(auto_generated)" readonly>
+            <input type = "datetime-local" id = "scheduled_input">
+            <button class = "cell" id = "save_button"> Save/Update </button>
+
+        </div>
+
+        <!--problems added in the session-->
+        <div class = "cell_column" id = 'session_problems'>
+        </div>
+
+        <!--problem library-->
+        <div class = "cell_column" id = 'all_problems'>
+        </div>
+    </div>
+
+    <script>
+
+        Sortable.create(document.getElementById('all_problems'), { group: 'problems' });
+        Sortable.create(document.getElementById('session_problems'), { group: 'problems' });
+
+        async function loadProblems() {
+
+            const library = document.getElementById('all_problems');
+            const selected = document.getElementById('session_problems');
+            const { data, error } = await client.from('problems').select('*');
+
+            const params = new URLSearchParams(window.location.search);
+            const sessionId = params.get('session');
+
+            let sessionProblemIds = [];
+
+            if (sessionId) {
+                const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
+                console.log(session, sessionError);
+                const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
+
+                document.getElementById('title_input').value = session.title;
+                document.getElementById('id_input').value = session.id;
+                if (session.scheduled_at) {
+                    document.getElementById('scheduled_input').value = session.scheduled_at.slice(0, 16);
+                }
+                for (const problem of sessionProblems) {
+                    const cell = document.createElement('button');
+                    cell.className = 'cell';
+                    cell.textContent = problem.problems.title;
+                    cell.dataset.problemId = problem.problem_id;   // (or problem.problem_id, in the sessionProblems loop)
+                    selected.appendChild(cell);
+
+                    sessionProblemIds.push(problem.problem_id);
+                }
+            }
+
+            for (const problem of data) {
+                if (sessionProblemIds.includes(problem.id)) continue;
+
+                const cell = document.createElement('button');
+                cell.className = 'cell';
+                cell.textContent = problem.title;
+                cell.dataset.problemId = problem.id;   // (or problem.problem_id, in the sessionProblems loop)
+                library.appendChild(cell);
+            }
+        }
+        
+        loadProblems();
+
+        //save button programming
+
+        const save_button = document.getElementById("save_button");
+        async function save() {
+            const title = document.getElementById('title_input').value;
+            const scheduledAt = document.getElementById('scheduled_input').value;
+
+            //try getting the session id
+            const params = new URLSearchParams(window.location.search);
+            let sessionId = params.get('session');
+
+            if (sessionId) {
+
+                // upsert in sessions
+                await client.from('sessions').upsert({ id: sessionId, title: title, scheduled_at: scheduledAt});
+
+                //delete existing rows from session_problems
+                await client.from('session_problems').delete().eq('session_id', sessionId);
+            }
+            else {
+                sessionId = crypto.randomUUID()
+                const { error: sessionInsertError } = await client.from('sessions').insert({ id: sessionId, title: title, scheduled_at: scheduledAt });
+                console.log(sessionInsertError);
+            }
+
+            // add problems to session problems
+            const children = document.getElementById('session_problems').children;
+            const rows = [];
+            let position = 0;
+            for (const cell of children) {
+                rows.push({ session_id: sessionId, problem_id: cell.dataset.problemId, position: position });
+                position++;
+            }
+            await client.from('session_problems').insert(rows);   
+            alert('Save complete!');
+        }
+
+        save_button.addEventListener('click', save);
+
+    </script>
+
+</body>
+
+</html>

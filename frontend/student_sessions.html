@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Student Sessions</title>
+    <link rel="stylesheet" href="shared.css">
+</head>
+
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div id = "the_screen" class = "screen" style = "justify-content: center;">
+
+        <!--Logo and go back to home-->
+        <button id = "go-home" class="cell" style="font-size: 150%;">Home</button>
+        <script>
+            const home_button = document.getElementById("go-home")
+            function goHome() {
+                window.location.href = 'student_dashboard.html';
+            }
+            home_button.addEventListener('click', goHome)
+        </script>
+
+        <!--Load the Sessions-->
+        <script>
+            async function init() {
+                const container = document.getElementById('the_screen');
+                const { data, error } = await client.from('sessions').select('*');
+                for (const session of data) {
+                    const cell = document.createElement('button');
+                    cell.className = 'cell';
+                    cell.textContent = session.title;
+                    container.appendChild(cell);
+                }
+            }
+            init();
+        </script>
+
+    </div>
+
+</body>
+
+</html>

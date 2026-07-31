@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html lang = "en">
+
+    <head>
+        <title>Student Login</title>
+        <link rel="stylesheet" href="shared.css">
+    </head>
+
+    <body>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+            const { createClient } = supabase;
+            const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+        </script>
+
+        <div class = "screen" style = "justify-content: center;">
+            
+            <!--Logo and go back to home-->
+            <button id = "go-home" class="cell" style="font-size: 150%;">Home</button>
+            <script>
+                const home_button = document.getElementById("go-home")
+                function goHome() {
+                    window.location.href = 'student_dashboard.html';
+                }
+                home_button.addEventListener('click', goHome)
+            </script>
+
+            <!--The Login using Google button-->
+            <button id = "google-login" class="cell" style="font-size: 150%;">Sign in with Google</button>
+            
+            <script>
+                const button = document.getElementById('google-login');
+                async function handleLogin() {
+                await client.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: 'http://localhost:8000/student_dashboard.html' }
+                });
+                }
+                button.addEventListener('click', handleLogin);
+                async function init() {
+                    const { data: { user } } = await client.auth.getUser();
+                    if (user) {
+                        window.location.href = 'student_dashboard.html';
+                    }
+                }
+                init();
+            </script>
+        </div>
+    </body>
+</html>

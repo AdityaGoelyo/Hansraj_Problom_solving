@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Session Builder</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "screen" style="justify-content: center;" id = "the_screen">
+
+        <button id = "make_new" class = "cell"> New Session </button>
+        <script>
+            const make_new_button = document.getElementById('make_new')
+            function new_session() {
+                window.location.href = 'session_builder.html';
+            }
+            make_new_button.addEventListener('click', new_session)
+        </script>
+
+        <!--Load the existing Sessions-->
+
+        <script>
+            async function init() {
+                const container = document.getElementById('the_screen');
+                const { data, error } = await client.from('sessions').select('*');
+                for (const session of data) {
+                    const cell = document.createElement('button');
+                    cell.className = 'cell';
+                    cell.textContent = session.title;
+                    cell.addEventListener('click', function click() {
+                        window.location.href = 'session_builder.html?session=' + session.id;
+                    });
+                    container.appendChild(cell);
+                }
+            }
+            init();
+        </script>
+
+    </div>
+
+</body>
+
+</html>
