@@ -26,7 +26,7 @@
 
     <script>
 
-        // profile or Login
+        // profile or Login check
 
         async function init() {
             const profile_button = document.getElementById('profile_login')
@@ -43,6 +43,8 @@
                 }
             }
 
+            // logic if the user is admin
+
             if (isAdmin) {
                 profile_button.textContent = user.user_metadata.name
                 await client.from('solvers').upsert({id: user.id, name: user.user_metadata.name, email: user.email})
@@ -50,6 +52,23 @@
                     window.location.href = 'admin_profile.html';
                 }
                 profile_button.addEventListener('click', goProfile)
+
+                // make or edit session page
+
+                const edit_button = document.getElementById('edit_sessions');
+                function go_edit() {
+                    window.location.href = 'select_session_to_build.html';
+                }
+                edit_button.addEventListener('click', go_edit)
+
+                // conduct sessions
+
+                const conduct_button = document.getElementById('conduct_sessions');
+                function go_conduct() {
+                    window.location.href = 'select_session_to_conduct.html';
+                }
+                conduct_button.addEventListener('click', go_conduct);
+                
             } else {
                 profile_button.textContent = 'Login'
                 function goLogin() {
@@ -61,21 +80,6 @@
 
         init();
 
-        // make or edit session page
-
-        const edit_button = document.getElementById('edit_sessions');
-        function go_edit() {
-            window.location.href = 'select_session.html';
-        }
-        edit_button.addEventListener('click', go_edit)
-
-        // conduct sessions
-
-        const conduct_button = document.getElementById('conduct_sessions');
-        function go_conduct() {
-            window.location.href = 'select_session_to_conduct.html';
-        }
-        conduct_button.addEventListener('click', go_conduct);
 
     </script>
 
