@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Session Conductor</title>
+    <link rel="stylesheet" href="../shared.css">
+</head>
+
+<body>
+
+    <script src = "admin_auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "screen" style="justify-content: center;" id = "the_screen">
+
+        <button class = "cell" id = "back">Back</button>
+        <script>
+
+            const back_button = document.getElementById("back");
+            function go_back() {
+                window.location.href = 'admin_homepage.html'
+            }
+            back_button.addEventListener('click', go_back)
+
+        </script>
+
+        <!--Load the existing Sessions-->
+
+        <script>
+            async function init() {
+                const ok = await isLoggedInAndAdmin();
+                if (ok) {
+                    const container = document.getElementById('the_screen');
+                    const { data, error } = await client.from('sessions').select('*');
+                    for (const session of data) {
+                        const cell = document.createElement('button');
+                        cell.className = 'cell';
+                        cell.textContent = session.title;
+                        cell.addEventListener('click', function click() {
+                            window.location.href = 'session_conductor.html?session=' + session.id;
+                        });
+                        container.appendChild(cell);
+                    }
+                }
+            }
+            init();
+        </script>
+
+    </div>
+
+</body>
+
+</html>
