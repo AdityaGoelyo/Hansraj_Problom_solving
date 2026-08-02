@@ -75,3 +75,6 @@ body {
   font-family: var(--font-mono);
   font-size: 60%;
 }
+.selected{
+  background: #ccd5ae;
+}

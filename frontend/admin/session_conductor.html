@@ -108,7 +108,7 @@
 
                         const problem_counter = document.getElementById("problem_counter");
                         const total_num_problems = Math.max(...sessionProblems.map(item => item.position));
-                        problem_counter.textContent = `Current Problem Number: ${current_problem_number}/${total_num_problems}`;
+                        problem_counter.textContent = `Current Problem Number: ${current_problem_number + 1}/${total_num_problems + 1}`;
 
                         // cell 2
 
@@ -176,7 +176,7 @@
                         },
                         (payload) => {
                             current_problem_number = payload.new.current_problem_number;
-                            problem_counter.textContent = `Current Problem Number: ${current_problem_number}/${total_num_problems}`;
+                            problem_counter.textContent = `Current Problem Number: ${current_problem_number + 1}/${total_num_problems + 1}`;
                             current_problem_title.textContent = sessionProblems[current_problem_number].problems.title;
                             current_problem_data.innerHTML = sessionProblems[current_problem_number].problems.statement_html;
                             current_problem_id.textContent = `Problem Id: ${sessionProblems[current_problem_number].problems.id}`;

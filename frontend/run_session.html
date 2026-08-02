@@ -44,7 +44,7 @@
 
         <div class = "cell">
                 <div class = "subcell" id = "problem_counter"></div>
-                <button class = "subcell" id = "proved"></button>
+                <button class = "subcell" id = "answer_button">Proved?</button>
         </div>
 
     </div>
@@ -54,7 +54,7 @@
         async function init() {
 
             // Load some data
-
+            const { data: { user } } = await client.auth.getUser();
             const params = new URLSearchParams(window.location.search);
             const sessionId = params.get('session');
             const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
@@ -73,7 +73,7 @@
 
             const problem_counter = document.getElementById("problem_counter");
             const total_num_problems = Math.max(...sessionProblems.map(item => item.position));
-            problem_counter.textContent = `Current Problem Number: ${current_problem_number}/${total_num_problems}`;
+            problem_counter.textContent = `Current Problem Number: ${current_problem_number + 1}/${total_num_problems + 1}`;
 
             const current_problem_title = document.getElementById("current_problem_title");
             current_problem_title.textContent = sessionProblems[current_problem_number].problems.title;
@@ -88,6 +88,16 @@
             const current_problem_id = document.getElementById("current_problem_id");
             current_problem_id.textContent = `Problem Id: ${sessionProblems[current_problem_number].problems.id}`;
 
+            // answer field
+
+            // proof based answer
+                const proof_based_answer_button = document.getElementById("answer_button");
+                let isProved = false;
+                proof_based_answer_button.addEventListener('click', function () {
+                    proof_based_answer_button.classList.toggle('selected');
+                    isProved = !isProved;
+                });
+
 
             // sync to database for current problem
 
@@ -99,12 +109,21 @@
                     table: 'sessions',
                     filter: `id=eq.${sessionId}`
                 },
-                (payload) => {
+                async (payload) => {
                     current_problem_number = payload.new.current_problem_number;
-                    problem_counter.textContent = `Current Problem Number: ${current_problem_number}/${total_num_problems}`;
+                    problem_counter.textContent = `Current Problem Number: ${current_problem_number + 1}/${total_num_problems + 1}`;
                     current_problem_title.textContent = sessionProblems[current_problem_number].problems.title;
                     current_problem_data.innerHTML = sessionProblems[current_problem_number].problems.statement_html;
                     current_problem_id.textContent = `Problem Id: ${sessionProblems[current_problem_number].problems.id}`;
+                    await client.from('attempts').insert({
+                        solver_id:user.id,
+                        problem_id:sessionProblems[current_problem_number].problems.id,
+                        session_id:sessionId,
+                        attempt_number:0, // correct this to a more dynamic number later
+                        is_correct:isProved
+                    })
+                    proof_based_answer_button.classList.remove('selected');
+                    isProved = false;
                 }   
                 ).subscribe();
         }
