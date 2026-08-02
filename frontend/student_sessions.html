@@ -36,6 +36,9 @@
                     const cell = document.createElement('button');
                     cell.className = 'cell';
                     cell.textContent = session.title;
+                    cell.addEventListener('click', function click() {
+                        window.location.href = 'run_session.html?session=' + session.id;
+                    });
                     container.appendChild(cell);
                 }
             }
