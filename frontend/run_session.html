@@ -17,6 +17,9 @@
             background: var(--light_paper);
             transform: scale(1);
         }
+        #answer_button.cell:hover {
+            background: var(--selected_green);
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -44,8 +47,9 @@
 
         <div class = "cell">
                 <div class = "subcell" id = "problem_counter"></div>
-                <button class = "subcell" id = "answer_button">Proved?</button>
         </div>
+
+        <button class = "cell" id = "answer_button">Proved?</button>
 
     </div>
 

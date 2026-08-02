@@ -6,16 +6,15 @@
   --light_paper: #f7f0f5;
   --font-ui:  "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --font-mono: "SF Mono", "Menlo", monospace;
+  --selected_green: #ccd5ae;
 }
 body {
-    margin: 0 auto;
-    max-width: 480px;
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-ui);
 }
 .screen {
-  max-width: 480px;
+  /*max-width: 480px;*/
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
@@ -76,5 +75,5 @@ body {
   font-size: 60%;
 }
 .selected{
-  background: #ccd5ae;
+  background: var(--selected_green);
 }
