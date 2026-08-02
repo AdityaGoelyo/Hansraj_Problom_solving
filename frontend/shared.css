@@ -9,12 +9,13 @@
   --selected_green: #ccd5ae;
 }
 body {
+    margin: 0 auto;
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-ui);
 }
 .screen {
-  /*max-width: 480px;*/
+  max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
@@ -72,7 +73,7 @@ body {
   border: None;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 60%;
+  font-size: 100%;
 }
 .selected{
   background: var(--selected_green);
