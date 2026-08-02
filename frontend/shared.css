@@ -63,3 +63,15 @@ body {
   border-left: 1px solid var(--line);
   border-right: 1px solid var(--line);
 }
+.subcell{
+  background: var(--light_paper);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+  border-radius: 4px;
+  border: None;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 60%;
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title id = "webpage_title"></title>
+    <link rel="stylesheet" href="shared.css">
+</head>
+
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "screen">
+
+        <!--session title and id-->
+
+        <div class = "cell"></div>
+
+        <!-- Render Problem -->
+
+        <div class = "cell"></div>
+
+        <!-- Session Controls: submit answer, current problem number/total problems-->
+
+        <div class = "cell">
+            <div class = "subcell" id = "current_problem_number"></div>
+        </div>
+
+    </div>
+
+    <script>
+
+        // get session id from url
+
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get('session');
+
+        // session controls cell
+
+        // problem number counter
+
+    </script>
+
+</body>
+
+</html>

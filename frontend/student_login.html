@@ -32,10 +32,11 @@
             
             <script>
                 const button = document.getElementById('google-login');
+                const u = new URL('student_dashboard.html', window.location.href)
                 async function handleLogin() {
                 await client.auth.signInWithOAuth({
                     provider: 'google',
-                    options: { redirectTo: 'https://adityagoelyo.github.io/Hansraj_Problom_solving/frontend/student_dashboard.html' }
+                    options: { redirectTo: u.href }
                 });
                 }
                 button.addEventListener('click', handleLogin);

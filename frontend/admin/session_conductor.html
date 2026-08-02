@@ -13,6 +13,27 @@
         body {
             max-width: 1440px;
         }
+        .cell:hover {
+            background: var(--light_paper);
+        }
+        .cell:active {
+            background: var(--light_paper);
+            transform: scale(1);
+        }
+        #previous_button:hover {
+            background: var(--line);
+        }
+        #previous_button:active {
+            background: var(--light_ink);
+            transform: scale(0.98);
+        }
+        #next_button:hover {
+            background: var(--line);
+        }
+        #next_button:active {
+            background: var(--light_ink);
+            transform: scale(0.98);
+        }
     </style>
     <script src = "admin_auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -22,18 +43,38 @@
         const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
     </script>
 
+    <!-- Header -->
+    <header class = "cell" id = "title" style="border-radius: 0px;"></header>
+
     <div class = "columns">
 
-        <!--column showing session details-->
+        <!--column 1-->
         <div class = "cell_column" id = "session_details_column">
 
-            <header class = "cell" id = "title"></header>
+            <!-- Show session details: Id, current problem number out of all others -->
+            <div class = "cell" id = "session_details">
+                <div class = "subcell" id = "session_id"></div>
+                <div class = "subcell" id = "problem_counter"></div>
+            </div>
+
+            <!-- Reder Current Problem: html + title -->
+            <div class = "cell" id = "current_problem">
+                <div class = "subcell" id = "current_problem_title" style="margin-bottom: 16px;"></div>
+                <div class = "subcell" id = "current_problem_data"></div>
+                <div class = "subcell" id = "current_problem_id" style="color: var(--light_ink);"></div>
+            </div>
+
+            <!-- Controls: Next Problem Button -->
+            <div class = "cell" id = "session_controls" style="flex-direction: row;">
+                <button class = "subcell" id = "previous_button" style="margin-right: 6px; padding: 8px;">Previous</button>
+                <button class = "subcell" id = "next_button" style="padding: 8px; margin: 6px;">Next</button>
+            </div>
 
         </div>
 
     </div>
 
-    <!--Jawascript for everything-->
+    <!--Javascript for everything-->
 
     <script>
 
@@ -42,20 +83,89 @@
                 if (ok) {
                     // Load some data
 
-                    const params = new URLSearchParams(window.location.search);
-                    const sessionId = params.get('session');
-                    const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
-                    const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
+                        const params = new URLSearchParams(window.location.search);
+                        const sessionId = params.get('session');
+                        const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
+                        const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
+                        let current_problem_number = session.current_problem_number;
 
                     // set webpage title
 
                     const webpage_title = document.getElementById("webpage_title");
                     webpage_title.textContent = session.title;
 
-                    // Populate first column
+                    // set header
 
                     const title_cell = document.getElementById('title');
-                    title_cell.textContent = session.title;
+                    title_cell.textContent = session.title; 
+
+                    // First column
+
+                        // cell 1
+                        const id_cell = document.getElementById('session_id');
+                        id_cell.textContent = `Session Id: ${sessionId}`;
+
+                        const problem_counter = document.getElementById("problem_counter");
+                        const total_num_problems = Math.max(...sessionProblems.map(item => item.position));
+                        problem_counter.textContent = `Current Problem Number: ${current_problem_number}/${total_num_problems}`;
+
+                        // cell 2
+
+                        // render problem title
+
+                        const current_problem_title = document.getElementById("current_problem_title");
+                        current_problem_title.textContent = sessionProblems[current_problem_number].problems.title;
+                        
+                        // render statement text
+
+                        const current_problem_data = document.getElementById("current_problem_data");
+                        current_problem_data.innerHTML = sessionProblems[current_problem_number].problems.statement_html;
+
+                        // render problem id
+
+                        const current_problem_id = document.getElementById("current_problem_id");
+                        current_problem_id.textContent = `Problem Id: ${sessionProblems[current_problem_number].problems.id}`;
+
+                        // cell 3
+
+                        // previous button
+
+                        const previous_button = document.getElementById("previous_button");
+                        async function previousPosition() {
+                            if (current_problem_number - 1 >= 0) {
+                                await client.from('sessions').update( {current_problem_number: current_problem_number-1} ).eq('id', sessionId);
+                            }  
+                        }
+                        previous_button.addEventListener('click', previousPosition);
+
+                        // next button
+
+                        const next_button = document.getElementById("next_button");
+                        async function nextPosition() {
+                            if (current_problem_number + 1 <= total_num_problems) {
+                                await client.from('sessions').update( {current_problem_number: current_problem_number+1} ).eq('id', sessionId);
+                            }  
+                        }
+                        next_button.addEventListener('click', nextPosition);
+
+                    // load things accoridng to latest problem number
+
+                        let current_session_params = client.channel('current_session_params').on(
+                        'postgres_changes',
+                        {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'sessions',
+                            filter: `id=eq.${sessionId}`
+                        },
+                        (payload) => {
+                            current_problem_number = payload.new.current_problem_number;
+                            problem_counter.textContent = `Current Problem Number: ${current_problem_number}/${total_num_problems}`;
+                            current_problem_title.textContent = sessionProblems[current_problem_number].problems.title;
+                            current_problem_data.innerHTML = sessionProblems[current_problem_number].problems.statement_html;
+                            current_problem_id.textContent = `Problem Id: ${sessionProblems[current_problem_number].problems.id}`;
+                        }   
+                        ).subscribe();
 
                 }
             }
