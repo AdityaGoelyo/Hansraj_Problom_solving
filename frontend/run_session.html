@@ -71,6 +71,7 @@
             const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
             const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
             let current_problem_number = session.current_problem_number;
+            let now = new Date().toISOString();
 
             // set webpage title
 
@@ -104,13 +105,23 @@
             // proof based answer
                 const proof_based_answer_button = document.getElementById("answer_button");
                 let isProved = false;
-                proof_based_answer_button.addEventListener('click', function () {
+                proof_based_answer_button.addEventListener('click', async function () {
                     proof_based_answer_button.classList.toggle('selected');
                     isProved = !isProved;
+                    if (isProved == true) {
+                        await client.from('session_states_log').update({closed_at: new Date().toISOString()}).eq('presented_at',now);
+                    }
                 });
 
 
             // sync to database for current problem
+
+            await client.from('session_states_log').insert({
+                    solver_id:user.id,
+                    problem_id:sessionProblems[current_problem_number].problems.id,
+                    session_id:sessionId,
+                    presented_at: now
+                });
 
             let current_session_params = client.channel('current_session_params').on(
                 'postgres_changes',
@@ -132,7 +143,14 @@
                         session_id:sessionId,
                         attempt_number:0, // correct this to a more dynamic number later
                         is_correct:isProved
-                    })
+                    });
+                    now = new Date().toISOString();
+                    await client.from('session_states_log').insert({
+                        solver_id:user.id,
+                        problem_id:sessionProblems[current_problem_number].problems.id,
+                        session_id:sessionId,
+                        presented_at: now
+                    });
                     proof_based_answer_button.classList.remove('selected');
                     isProved = false;
                 }   

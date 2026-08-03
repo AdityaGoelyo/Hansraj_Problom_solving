@@ -74,11 +74,27 @@
 
             <!-- Controls: Next Problem Button -->
             <div class = "cell" id = "session_controls" style="flex-direction: row;">
-                <button class = "subcell" id = "previous_button" style="margin-right: 6px; padding: 8px;">Previous</button>
+                <button class = "subcell" id = "previous_button" style="margin: 6px; padding: 8px;">Previous</button>
                 <button class = "subcell" id = "next_button" style="padding: 8px; margin: 6px;">Next</button>
             </div>
 
         </div>
+
+        <!-- Column 2 -->
+        <div class = "cell_column">
+
+            <div class = "cell">
+                <div class = "subcell">Number of Submissions</div>
+                <div class = "subcell" id = "fraction_submissions">loading...</div>
+            </div>
+
+
+            <!-- Back Button -->
+            <div class = "cell">
+                <button class= "subcell nav_button" id = "back_button">Back to Session Selector</button>
+            </div>
+        </div>
+
 
     </div>
 
@@ -96,6 +112,7 @@
                         const { data: session, error: sessionError } = await client.from('sessions').select('*').eq('id', sessionId).single();
                         const { data: sessionProblems } = await client.from('session_problems').select('*, problems(*)').eq('session_id', sessionId).order('position');
                         let current_problem_number = session.current_problem_number;
+                        const problem_start_time = new Date().toISOString();
 
                     // set webpage title
 
@@ -137,12 +154,12 @@
                         // cell 3
 
                         // previous button
-
+                        
                         const previous_button = document.getElementById("previous_button");
                         async function previousPosition() {
                             if (current_problem_number - 1 >= 0) {
                                 await client.from('sessions').update( {current_problem_number: current_problem_number-1} ).eq('id', sessionId);
-                                now = new Date().toISOString();
+                                let now = new Date().toISOString();
                                 await client.from('session_states_log').insert( {session_id: sessionId, problem_id:sessionProblems[current_problem_number].problems.id, closed_at:now} );
                                 await client.from('session_states_log').insert( {session_id: sessionId, problem_id:sessionProblems[current_problem_number-1].problems.id, presented_at:now} );
                             }  
@@ -155,7 +172,7 @@
                         async function nextPosition() {
                             if (current_problem_number + 1 <= total_num_problems) {
                                 await client.from('sessions').update( {current_problem_number: current_problem_number+1} ).eq('id', sessionId);
-                                now = new Date().toISOString();
+                                let now = new Date().toISOString();
                                 await client.from('session_states_log').insert( {session_id: sessionId, problem_id:sessionProblems[current_problem_number].problems.id, closed_at:now} );
                                 await client.from('session_states_log').insert( {session_id: sessionId, problem_id:sessionProblems[current_problem_number + 1].problems.id, presented_at:now} );
                             }  
@@ -165,6 +182,21 @@
                     // Column 2
 
                         // cell 1 - number of students who have submitted
+
+                        let { data:students_in_session_on_problem, error:error_students_in_session_on_problem } = await client.from('session_states_log').select('solver_id').eq('session_id',sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('presented_at', problem_start_time);
+                        let { data:students_solved, error:error_students_solved } = await client.from('session_states_log').select('solver_id').eq('session_id', sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('closed_at', problem_start_time);
+                        let number_of_students_in_session_on_problem = new Set(students_in_session_on_problem.map(row => row.solver_id)).size;
+                        let number_of_solved = new Set(students_solved.map(row => row.solver_id)).size;
+                        fraction_submissions = document.getElementById('fraction_submissions');
+                        fraction_submissions.textContent = `${number_of_solved}/${number_of_students_in_session_on_problem}`;
+
+                        // cell 2 - back button
+
+                        const back_button = document.getElementById("back_button");
+                        function back() {
+                            window.location.href = 'select_session_to_conduct.html';
+                        }
+                        back_button.addEventListener('click', back)
                         
                     // Update Session States Log
                     
@@ -188,6 +220,24 @@
                             current_problem_data.innerHTML = sessionProblems[current_problem_number].problems.statement_html;
                             current_problem_id.textContent = `Problem Id: ${sessionProblems[current_problem_number].problems.id}`;
                         }   
+                        ).subscribe();
+
+                        let session_states_log = client.channel('session_states_log').on(
+                            'postgres_changes',
+                            {
+                                event: '*',
+                                schema: 'public',
+                                table: 'session_states_log',
+                                filter: `session_id=eq.${sessionId}`
+                            },
+                            async (payload) => {
+                                let { data:students_in_session_on_problem, error:error_students_in_session_on_problem } = await client.from('session_states_log').select('solver_id').eq('session_id',sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('presented_at', problem_start_time);
+                                let { data:students_solved, error:error_students_solved } = await client.from('session_states_log').select('solver_id').eq('session_id', sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('closed_at', problem_start_time);
+                                number_of_students_in_session_on_problem = new Set(students_in_session_on_problem.map(row => row.solver_id)).size;
+                                number_of_solved = new Set(students_solved.map(row => row.solver_id)).size;
+                                fraction_submissions = document.getElementById('fraction_submissions');
+                                fraction_submissions.textContent = `${number_of_solved}/${number_of_students_in_session_on_problem}`;
+                            }
                         ).subscribe();
                 }
             }

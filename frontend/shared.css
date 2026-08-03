@@ -78,3 +78,12 @@ body {
 .selected{
   background: var(--selected_green);
 }
+.nav_button:hover {
+    background: var(--line);
+}
+.nav_button:active {
+    background: var(--light_ink);
+    transform: scale(0.98);
+    padding: 8px;
+    margin: 8px;
+}
