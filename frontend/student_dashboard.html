@@ -20,20 +20,25 @@
 
         <!-- The Profile / Login button -->
 
-        <button class = "cell" id = "profile_login">
+        <button class = "cell nav_button" id = "profile_login">
 
         </button>
 
         <!-- The Sessions Button -->
 
-        <button class = "cell" id = "sessions">
+        <button class = "cell nav_button" id = "sessions">
             Sessions
         </button>
 
         <!-- The Problem Library Button -->
         
-        <button class = "cell" id = "problem_library">
+        <button class = "cell nav_button" id = "problem_library">
             Problem Library
+        </button>
+
+        <!-- back -->
+        <button class = "cell nav_button" id = "back">
+            Back
         </button>
 
     </div>
@@ -71,6 +76,11 @@
                 window.location.href = 'student_problem_library.html';
             }
             problem_library_button.addEventListener('click', goProblemLibrary)
+
+            const back_button = document.getElementById('back');
+            back_button.addEventListener('click', function(){
+                window.location.href = '../index.html'
+            })
         </script>
 </body> 
 

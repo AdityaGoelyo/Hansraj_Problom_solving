@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Hansraj Problem Solving</title>
+    <link rel="stylesheet" href="frontend/shared.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+    <div class = "screen" style="justify-content: center;">
+
+        <div class = "cell" style="text-align:center;">Welcome to<br>Hansraj Problem Solving Platform</div>
+        <button class="cell" id="student">Student Dashboard</button>
+        <button class="cell" id="admin">Admin Dashboard</button>
+
+    </div>
+
+    <script>
+
+        const student = document.getElementById('student');
+        student.addEventListener('click', function(){
+            window.location.href = 'frontend/student_dashboard.html'
+        });
+        const admin = document.getElementById('admin');
+        admin.addEventListener('click', function(){
+            window.location.href = 'frontend/admin/admin_homepage.html'
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -38,13 +38,6 @@ body {
   font-family: var(--font-mono);
   font-size: 150%;
 }
-.cell:hover {
-    background: var(--line);
-}
-.cell:active {
-    background: var(--light_ink);
-    transform: scale(0.98);
-}
 .columns {
   display: flex;
   flex-direction: row;

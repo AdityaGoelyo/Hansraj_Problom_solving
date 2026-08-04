@@ -19,9 +19,10 @@
 
     <div class = "screen" style="justify-content: center;">
 
-        <button class = "cell" id = "profile_login"></button>
-        <button class = "cell" id = "edit_sessions">Make or Edit Sessions</button>
-        <button class = "cell" id = "conduct_sessions">Conduct Sessions</button>
+        <button class = "cell nav_button" id = "profile_login"></button>
+        <button class = "cell nav_button" id = "edit_sessions">Make or Edit Sessions</button>
+        <button class = "cell nav_button" id = "conduct_sessions">Conduct Sessions</button>
+        <button class = "cell nav_button" id = "back">Back</button>
 
     </div>
 
@@ -33,6 +34,11 @@
             const profile_button = document.getElementById('profile_login')
             const { data: { user } } = await client.auth.getUser();
             console.log(user);
+
+            const back_button = document.getElementById('back');
+            back_button.addEventListener('click', function(){
+                window.location.href = '../../index.html'
+            })
 
             let isAdmin = false;
             if (user) {
