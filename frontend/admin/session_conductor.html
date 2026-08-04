@@ -52,7 +52,7 @@
     </script>
 
     <!-- Header -->
-    <header class = "cell" id = "title" style="border-radius: 0px;"></header>
+    <header class = "cell" id = "title" style="border-radius: 0px; font-size: 32px; justify-content: center; flex-direction: row;"></header>
 
     <div class = "columns">
 
@@ -185,8 +185,8 @@
 
                         let { data:students_in_session_on_problem, error:error_students_in_session_on_problem } = await client.from('session_states_log').select('solver_id').eq('session_id',sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('presented_at', problem_start_time);
                         let { data:students_solved, error:error_students_solved } = await client.from('session_states_log').select('solver_id').eq('session_id', sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('closed_at', problem_start_time);
-                        let number_of_students_in_session_on_problem = new Set(students_in_session_on_problem.map(row => row.solver_id)).size;
-                        let number_of_solved = new Set(students_solved.map(row => row.solver_id)).size;
+                        let number_of_students_in_session_on_problem = new Set(students_in_session_on_problem.map(row => row.solver_id).filter(id => id !== null)).size;
+                        let number_of_solved = new Set(students_solved.map(row => row.solver_id).filter(id => id !== null)).size;
                         fraction_submissions = document.getElementById('fraction_submissions');
                         fraction_submissions.textContent = `${number_of_solved}/${number_of_students_in_session_on_problem}`;
 
@@ -233,9 +233,8 @@
                             async (payload) => {
                                 let { data:students_in_session_on_problem, error:error_students_in_session_on_problem } = await client.from('session_states_log').select('solver_id').eq('session_id',sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('presented_at', problem_start_time);
                                 let { data:students_solved, error:error_students_solved } = await client.from('session_states_log').select('solver_id').eq('session_id', sessionId).eq('problem_id', sessionProblems[current_problem_number].problems.id).gt('closed_at', problem_start_time);
-                                number_of_students_in_session_on_problem = new Set(students_in_session_on_problem.map(row => row.solver_id)).size;
-                                number_of_solved = new Set(students_solved.map(row => row.solver_id)).size;
-                                fraction_submissions = document.getElementById('fraction_submissions');
+                                number_of_students_in_session_on_problem = new Set(students_in_session_on_problem.map(row => row.solver_id).filter(id => id !== null)).size;
+                                number_of_solved = new Set(students_solved.map(row => row.solver_id).filter(id => id !== null)).size;
                                 fraction_submissions.textContent = `${number_of_solved}/${number_of_students_in_session_on_problem}`;
                             }
                         ).subscribe();
