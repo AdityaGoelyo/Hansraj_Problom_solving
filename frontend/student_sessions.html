@@ -35,7 +35,7 @@
                 const { data, error } = await client.from('sessions').select('*');
                 for (const session of data) {
                     const cell = document.createElement('button');
-                    cell.className = 'cell';
+                    cell.className = 'cell nav_button';
                     cell.textContent = session.title;
                     cell.addEventListener('click', function click() {
                         window.location.href = 'run_session.html?session=' + session.id;

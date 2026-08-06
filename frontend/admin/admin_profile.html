@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="../shared.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient('https://njeksdjjndvqpueniyps.supabase.co', 'sb_publishable_1Xo-DLe_Y5eGdOfTr7nSeg_K8rju5uF');
+    </script>
+
+    <div class = "screen" style = "justify-content: center;">
+
+        <!--Logo and go back to home-->
+        <button id = "go-home" class="cell nav_button">Home</button>
+        <script>
+            const home_button = document.getElementById("go-home")
+            function goHome() {
+                window.location.href = 'admin_homepage.html';
+            }
+            home_button.addEventListener('click', goHome)
+        </script>
+
+        <!--Logout-->
+        <button id = "logout" class="cell nav_button" style="font-size: 150%;">Logout</button>
+        <script>
+            const logout_button = document.getElementById("logout")
+            async function handleLogout() {
+                await client.auth.signOut();
+                window.location.href = 'admin_homepage.html';
+            }
+            logout_button.addEventListener('click', handleLogout)
+        </script>
+    </div>
+
+</body>
+
+</html>
